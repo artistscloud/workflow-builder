@@ -1,0 +1,384 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>No-Code Workflow Builder</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="app-container">
+        <div class="toolbar">
+            <div class="app-title">Workflow Builder</div>
+            <div class="controls">
+                <button id="new-workflow" class="btn">New Workflow</button>
+                <button id="save-workflow" class="btn primary">Save</button>
+                <button id="run-workflow" class="btn success">Run Workflow</button>
+            </div>
+        </div>
+        <div class="workspace-container">
+            <!-- Top node palette -->
+            <div class="nodes-palette-top">
+                <div class="search-container">
+                    <input type="text" id="node-search" placeholder="Search Nodes">
+                </div>
+                <div class="category-tabs">
+                    <div class="category-tab active" data-category="general">General</div>
+                    <div class="category-tab" data-category="llms">LLMs</div>
+                    <div class="category-tab" data-category="knowledge-base">Knowledge Base</div>
+                    <div class="category-tab" data-category="integrations">Integrations</div>
+                    <div class="category-tab" data-category="triggers">Triggers</div>
+                    <div class="category-tab" data-category="data-loaders">Data Loaders</div>
+                    <div class="category-tab" data-category="multi-modal">Multi-Modal</div>
+                    <div class="category-tab" data-category="logic">Logic</div>
+                    <div class="category-tab" data-category="data-transformation">Data Transformation</div>
+                    <div class="category-tab" data-category="chat">Chat</div>
+                </div>
+                <div class="node-categories-container">
+                    <!-- General nodes -->
+                    <div class="node-grid" data-category="general">
+                        <div class="node-card" data-type="input">
+                            <div class="node-icon"><i class="fas fa-arrow-right-to-bracket"></i></div>
+                            <div class="node-label">Input</div>
+                        </div>
+                        <div class="node-card" data-type="output">
+                            <div class="node-icon"><i class="fas fa-arrow-right-from-bracket"></i></div>
+                            <div class="node-label">Output</div>
+                        </div>
+                        <div class="node-card" data-type="text">
+                            <div class="node-icon"><i class="fas fa-font"></i></div>
+                            <div class="node-label">Text</div>
+                        </div>
+                        <div class="node-card" data-type="pipeline">
+                            <div class="node-icon"><i class="fas fa-diagram-project"></i></div>
+                            <div class="node-label">Pipeline</div>
+                        </div>
+                        <div class="node-card" data-type="transform">
+                            <div class="node-icon"><i class="fas fa-wand-magic-sparkles"></i></div>
+                            <div class="node-label">Transform</div>
+                        </div>
+                        <div class="node-card" data-type="share">
+                            <div class="node-icon"><i class="fas fa-share-nodes"></i></div>
+                            <div class="node-label">Share</div>
+                        </div>
+                        <div class="node-card" data-type="file-save">
+                            <div class="node-icon"><i class="fas fa-floppy-disk"></i></div>
+                            <div class="node-label">File Save</div>
+                        </div>
+                        <div class="node-card" data-type="note">
+                            <div class="node-icon"><i class="fas fa-note-sticky"></i></div>
+                            <div class="node-label">Note</div>
+                        </div>
+                    </div>
+
+                    <!-- LLMs nodes -->
+                    <div class="node-grid" data-category="llms" style="display: none;">
+                        <div class="node-card" data-type="openai">
+                            <div class="node-icon"><i class="fas fa-brain"></i></div>
+                            <div class="node-label">OpenAI</div>
+                        </div>
+                        <div class="node-card" data-type="anthropic">
+                            <div class="node-icon"><i class="fas fa-a"></i></div>
+                            <div class="node-label">Anthropic</div>
+                        </div>
+                        <div class="node-card" data-type="cohere">
+                            <div class="node-icon"><i class="fas fa-c"></i></div>
+                            <div class="node-label">Cohere</div>
+                        </div>
+                        <div class="node-card" data-type="aws">
+                            <div class="node-icon"><i class="fab fa-aws"></i></div>
+                            <div class="node-label">AWS</div>
+                        </div>
+                        <div class="node-card" data-type="google">
+                            <div class="node-icon"><i class="fab fa-google"></i></div>
+                            <div class="node-label">Google</div>
+                        </div>
+                        <div class="node-card" data-type="azure">
+                            <div class="node-icon"><i class="fab fa-microsoft"></i></div>
+                            <div class="node-label">Azure</div>
+                        </div>
+                        <div class="node-card" data-type="perplexity">
+                            <div class="node-icon"><i class="fas fa-p"></i></div>
+                            <div class="node-label">Perplexity</div>
+                        </div>
+                        <div class="node-card" data-type="xai">
+                            <div class="node-icon"><i class="fas fa-x"></i></div>
+                            <div class="node-label">xAI</div>
+                        </div>
+                        <div class="node-card" data-type="open-source">
+                            <div class="node-icon"><i class="fas fa-code-branch"></i></div>
+                            <div class="node-label">Open Source</div>
+                        </div>
+                        <div class="node-card" data-type="custom">
+                            <div class="node-icon"><i class="fas fa-gear"></i></div>
+                            <div class="node-label">Custom</div>
+                        </div>
+                    </div>
+
+                    <!-- Knowledge Base nodes -->
+                    <div class="node-grid" data-category="knowledge-base" style="display: none;">
+                        <div class="node-card" data-type="knowledge">
+                            <div class="node-icon"><i class="fas fa-book"></i></div>
+                            <div class="node-label">Knowledge</div>
+                        </div>
+                        <div class="node-card" data-type="search">
+                            <div class="node-icon"><i class="fas fa-search"></i></div>
+                            <div class="node-label">Search</div>
+                        </div>
+                        <div class="node-card" data-type="kb-actions">
+                            <div class="node-icon"><i class="fas fa-bolt"></i></div>
+                            <div class="node-label">KB Actions</div>
+                        </div>
+                    </div>
+
+                    <!-- Additional categories for other node types would be added here -->
+                    <div class="node-grid" data-category="integrations" style="display: none;">
+                        <!-- Integrations nodes -->
+                        <div class="node-card" data-type="airtable">
+                            <div class="node-icon"><i class="fas fa-table"></i></div>
+                            <div class="node-label">Airtable</div>
+                        </div>
+                        <div class="node-card" data-type="blend-ai">
+                            <div class="node-icon"><i class="fas fa-cube"></i></div>
+                            <div class="node-label">Blend AI</div>
+                        </div>
+                        <div class="node-card" data-type="copper">
+                            <div class="node-icon"><i class="fas fa-copyright"></i></div>
+                            <div class="node-label">Copper</div>
+                        </div>
+                        <div class="node-card" data-type="discord">
+                            <div class="node-icon"><i class="fab fa-discord"></i></div>
+                            <div class="node-label">Discord</div>
+                        </div>
+                        <div class="node-card" data-type="gmail">
+                            <div class="node-icon"><i class="fas fa-envelope"></i></div>
+                            <div class="node-label">Gmail</div>
+                        </div>
+                        <div class="node-card" data-type="gcal">
+                            <div class="node-icon"><i class="far fa-calendar"></i></div>
+                            <div class="node-label">GCal</div>
+                        </div>
+                        <div class="node-card" data-type="gdocs">
+                            <div class="node-icon"><i class="far fa-file-alt"></i></div>
+                            <div class="node-label">GDocs</div>
+                        </div>
+                        <div class="node-card" data-type="gdrive">
+                            <div class="node-icon"><i class="fab fa-google-drive"></i></div>
+                            <div class="node-label">GDrive</div>
+                        </div>
+                        <div class="node-card" data-type="gsheets">
+                            <div class="node-icon"><i class="far fa-file-spreadsheet"></i></div>
+                            <div class="node-label">GSheets</div>
+                        </div>
+                        <div class="node-card" data-type="hubspot">
+                            <div class="node-icon"><i class="fas fa-h-square"></i></div>
+                            <div class="node-label">Hubspot</div>
+                        </div>
+                        <div class="node-card" data-type="linear">
+                            <div class="node-icon"><i class="fas fa-clipboard-list"></i></div>
+                            <div class="node-label">Linear</div>
+                        </div>
+                        <div class="node-card" data-type="onedrive">
+                            <div class="node-icon"><i class="fas fa-cloud"></i></div>
+                            <div class="node-label">OneDrive</div>
+                        </div>
+                        <div class="node-card" data-type="outlook">
+                            <div class="node-icon"><i class="far fa-envelope"></i></div>
+                            <div class="node-label">Outlook</div>
+                        </div>
+                        <div class="node-card" data-type="notion">
+                            <div class="node-icon"><i class="fas fa-n"></i></div>
+                            <div class="node-label">Notion</div>
+                        </div>
+                        <div class="node-card" data-type="salesforce">
+                            <div class="node-icon"><i class="fas fa-cloud"></i></div>
+                            <div class="node-label">Salesforce</div>
+                        </div>
+                        <div class="node-card" data-type="slack">
+                            <div class="node-icon"><i class="fab fa-slack"></i></div>
+                            <div class="node-label">Slack</div>
+                        </div>
+                        <div class="node-card" data-type="teams">
+                            <div class="node-icon"><i class="fas fa-users"></i></div>
+                            <div class="node-label">Teams</div>
+                        </div>
+                        <div class="node-card" data-type="twilio">
+                            <div class="node-icon"><i class="fas fa-phone"></i></div>
+                            <div class="node-label">Twilio</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Trigger nodes -->
+                    <div class="node-grid" data-category="triggers" style="display: none;">
+                        <div class="node-card" data-type="outlook">
+                            <div class="node-icon"><i class="far fa-envelope"></i></div>
+                            <div class="node-label">Outlook</div>
+                        </div>
+                        <div class="node-card" data-type="gmail">
+                            <div class="node-icon"><i class="fas fa-envelope"></i></div>
+                            <div class="node-label">Gmail</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Data loader nodes -->
+                    <div class="node-grid" data-category="data-loaders" style="display: none;">
+                        <div class="node-card" data-type="file">
+                            <div class="node-icon"><i class="far fa-file"></i></div>
+                            <div class="node-label">File</div>
+                        </div>
+                        <div class="node-card" data-type="api">
+                            <div class="node-icon"><i class="fas fa-code"></i></div>
+                            <div class="node-label">API</div>
+                        </div>
+                        <div class="node-card" data-type="csv">
+                            <div class="node-icon"><i class="fas fa-table"></i></div>
+                            <div class="node-label">CSV</div>
+                        </div>
+                        <div class="node-card" data-type="url">
+                            <div class="node-icon"><i class="fas fa-link"></i></div>
+                            <div class="node-label">URL</div>
+                        </div>
+                        <div class="node-card" data-type="wiki">
+                            <div class="node-icon"><i class="fab fa-wikipedia-w"></i></div>
+                            <div class="node-label">Wiki</div>
+                        </div>
+                        <div class="node-card" data-type="youtube">
+                            <div class="node-icon"><i class="fab fa-youtube"></i></div>
+                            <div class="node-label">YouTube</div>
+                        </div>
+                        <div class="node-card" data-type="arxiv">
+                            <div class="node-icon"><i class="fas fa-scroll"></i></div>
+                            <div class="node-label">Arxiv</div>
+                        </div>
+                        <div class="node-card" data-type="rss">
+                            <div class="node-icon"><i class="fas fa-rss"></i></div>
+                            <div class="node-label">RSS</div>
+                        </div>
+                        <div class="node-card" data-type="web-search">
+                            <div class="node-icon"><i class="fas fa-globe"></i></div>
+                            <div class="node-label">Web Search</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Multi-modal nodes -->
+                    <div class="node-grid" data-category="multi-modal" style="display: none;">
+                        <div class="node-card" data-type="audio">
+                            <div class="node-icon"><i class="fas fa-headphones"></i></div>
+                            <div class="node-label">Audio</div>
+                        </div>
+                        <div class="node-card" data-type="image">
+                            <div class="node-icon"><i class="far fa-image"></i></div>
+                            <div class="node-label">Image</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Logic nodes -->
+                    <div class="node-grid" data-category="logic" style="display: none;">
+                        <div class="node-card" data-type="condition">
+                            <div class="node-icon"><i class="fas fa-code-branch"></i></div>
+                            <div class="node-label">Condition</div>
+                        </div>
+                        <div class="node-card" data-type="merge">
+                            <div class="node-icon"><i class="fas fa-object-group"></i></div>
+                            <div class="node-label">Merge</div>
+                        </div>
+                        <div class="node-card" data-type="time">
+                            <div class="node-icon"><i class="far fa-clock"></i></div>
+                            <div class="node-label">Time</div>
+                        </div>
+                        <div class="node-card" data-type="ttsql">
+                            <div class="node-icon"><i class="fas fa-database"></i></div>
+                            <div class="node-label">TTSQL</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Data transformation nodes -->
+                    <div class="node-grid" data-category="data-transformation" style="display: none;">
+                        <div class="node-card" data-type="text-ops">
+                            <div class="node-icon"><i class="fas fa-font"></i></div>
+                            <div class="node-label">Text Ops</div>
+                        </div>
+                        <div class="node-card" data-type="json-ops">
+                            <div class="node-icon"><i class="fas fa-brackets-curly"></i></div>
+                            <div class="node-label">JSON Ops</div>
+                        </div>
+                        <div class="node-card" data-type="list-ops">
+                            <div class="node-icon"><i class="fas fa-list"></i></div>
+                            <div class="node-label">List Ops</div>
+                        </div>
+                        <div class="node-card" data-type="file-ops">
+                            <div class="node-icon"><i class="far fa-file-alt"></i></div>
+                            <div class="node-label">File Ops</div>
+                        </div>
+                        <div class="node-card" data-type="ai-ops">
+                            <div class="node-icon"><i class="fas fa-robot"></i></div>
+                            <div class="node-label">AI Ops</div>
+                        </div>
+                        <div class="node-card" data-type="notifications">
+                            <div class="node-icon"><i class="fas fa-bell"></i></div>
+                            <div class="node-label">Notifications</div>
+                        </div>
+                        <div class="node-card" data-type="data-enrichment">
+                            <div class="node-icon"><i class="fas fa-chart-line"></i></div>
+                            <div class="node-label">Data enrichment</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Chat nodes -->
+                    <div class="node-grid" data-category="chat" style="display: none;">
+                        <div class="node-card" data-type="chat-memory">
+                            <div class="node-icon"><i class="fas fa-comments"></i></div>
+                            <div class="node-label">Chat Memory</div>
+                        </div>
+                        <div class="node-card" data-type="data-collector">
+                            <div class="node-icon"><i class="fas fa-table"></i></div>
+                            <div class="node-label">Data Collector</div>
+                        </div>
+                        <div class="node-card" data-type="chat-file-reader">
+                            <div class="node-icon"><i class="fas fa-file-download"></i></div>
+                            <div class="node-label">Chat File Reader</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="main-content">
+                <div class="workflow-canvas" id="workflow-canvas">
+                    <!-- Nodes will be added here dynamically -->
+                </div>
+                <div class="properties-panel" id="properties-panel">
+                    <div class="properties-header">Properties</div>
+                    <div class="properties-content">
+                        <div class="placeholder-message">Select a node to view its properties</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Node Templates -->
+    <template id="node-template">
+        <div class="workflow-node" tabindex="0">
+            <div class="node-header">
+                <div class="node-title"></div>
+                <button class="node-delete-btn">×</button>
+            </div>
+            <div class="node-body"></div>
+            <div class="node-ports">
+                <div class="input-ports"></div>
+                <div class="output-ports"></div>
+            </div>
+        </div>
+    </template>
+    
+    <!-- Connection Template -->
+    <template id="connection-template">
+        <svg class="connection-path" xmlns="http://www.w3.org/2000/svg">
+            <path d="" fill="none" stroke="#6366F1" stroke-width="2"></path>
+        </svg>
+    </template>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsPlumb/2.15.6/js/jsplumb.min.js"></script>
+    <script src="scripts.js"></script>
+</body>
+</html>

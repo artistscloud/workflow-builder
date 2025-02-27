@@ -511,6 +511,227 @@ document.addEventListener('DOMContentLoaded', function() {
         getNodeConfigByType(type) {
             // Default node configurations
             const nodeConfigs = {
+                input: {
+                    title: 'Input',
+                    description: 'Pass data of different types into your workflow',
+                    inputs: [],
+                    outputs: [
+                        { id: 'text', label: 'Text', type: 'string' }
+                    ],
+                    properties: [
+                        { id: 'name', label: 'Node Name', type: 'text', default: 'Input' },
+                        { id: 'type', label: 'Type', type: 'select', options: [
+                            { value: 'text', label: 'Text' },
+                            { value: 'file', label: 'File' },
+                            { value: 'audio', label: 'Audio' }
+                        ], default: 'text' }
+                    ],
+                    defaultConfig: {
+                        name: 'Input',
+                        type: 'text'
+                    },
+                    bodyTemplate: `
+                        <div class="node-info">
+                            <div class="node-id">input_0</div>
+                            <div class="node-type-selector">
+                                <div class="type-label">Type <i class="fas fa-circle-info"></i></div>
+                                <div class="type-value">Text</div>
+                            </div>
+                        </div>
+                    `,
+                    updateVisuals: (element, config) => {
+                        const typeDisplay = element.querySelector('.type-value');
+                        if (typeDisplay) {
+                            typeDisplay.textContent = config.type ? config.type.charAt(0).toUpperCase() + config.type.slice(1) : 'Text';
+                        }
+                        
+                        // Update outputs based on type
+                        const node = element.closest('.workflow-node');
+                        if (node) {
+                            const nodeId = node.id;
+                            const outputsContainer = node.querySelector('.output-ports');
+                            outputsContainer.innerHTML = ''; // Clear existing outputs
+                            
+                            if (config.type === 'text') {
+                                // Add text output
+                                const portGroup = document.createElement('div');
+                                portGroup.className = 'output-port-group';
+                                
+                                const label = document.createElement('span');
+                                label.className = 'port-label';
+                                label.textContent = 'Text';
+                                
+                                const port = document.createElement('div');
+                                port.className = 'port output-port';
+                                port.dataset.portId = 'text';
+                                port.dataset.portType = 'string';
+                                
+                                portGroup.appendChild(label);
+                                portGroup.appendChild(port);
+                                outputsContainer.appendChild(portGroup);
+                            } else if (config.type === 'file') {
+                                // Add processed_text output
+                                const textPortGroup = document.createElement('div');
+                                textPortGroup.className = 'output-port-group';
+                                
+                                const textLabel = document.createElement('span');
+                                textLabel.className = 'port-label';
+                                textLabel.textContent = 'Processed Text';
+                                
+                                const textPort = document.createElement('div');
+                                textPort.className = 'port output-port';
+                                textPort.dataset.portId = 'processed_text';
+                                textPort.dataset.portType = 'string';
+                                
+                                textPortGroup.appendChild(textLabel);
+                                textPortGroup.appendChild(textPort);
+                                outputsContainer.appendChild(textPortGroup);
+                                
+                                // Add file output
+                                const filePortGroup = document.createElement('div');
+                                filePortGroup.className = 'output-port-group';
+                                
+                                const fileLabel = document.createElement('span');
+                                fileLabel.className = 'port-label';
+                                fileLabel.textContent = 'File';
+                                
+                                const filePort = document.createElement('div');
+                                filePort.className = 'port output-port';
+                                filePort.dataset.portId = 'file';
+                                filePort.dataset.portType = 'file';
+                                
+                                filePortGroup.appendChild(fileLabel);
+                                filePortGroup.appendChild(filePort);
+                                outputsContainer.appendChild(filePortGroup);
+                            } else if (config.type === 'audio') {
+                                // Add audio output
+                                const portGroup = document.createElement('div');
+                                portGroup.className = 'output-port-group';
+                                
+                                const label = document.createElement('span');
+                                label.className = 'port-label';
+                                label.textContent = 'Audio';
+                                
+                                const port = document.createElement('div');
+                                port.className = 'port output-port';
+                                port.dataset.portId = 'audio';
+                                port.dataset.portType = 'audio';
+                                
+                                portGroup.appendChild(label);
+                                portGroup.appendChild(port);
+                                outputsContainer.appendChild(portGroup);
+                            }
+                            
+                            // Refresh jsPlumb endpoints
+                            WorkflowBuilder.jsPlumbInstance.repaintEverything();
+                        }
+                    }
+                },
+                output: {
+                    title: 'Output',
+                    description: 'Output data of different types from your workflow',
+                    inputs: [
+                        { id: 'output', label: 'Output', type: 'any' }
+                    ],
+                    outputs: [],
+                    properties: [
+                        { id: 'name', label: 'Node Name', type: 'text', default: 'Output' },
+                        { id: 'type', label: 'Type', type: 'select', options: [
+                            { value: 'text', label: 'Text' },
+                            { value: 'streamed_text', label: 'Streamed Text' },
+                            { value: 'file', label: 'File' },
+                            { value: 'image', label: 'Image' },
+                            { value: 'audio', label: 'Audio' },
+                            { value: 'json', label: 'JSON' }
+                        ], default: 'text' },
+                        { id: 'outputField', label: 'Output', type: 'text', required: true },
+                        { id: 'formatOutput', label: 'Format Output', type: 'checkbox', default: true }
+                    ],
+                    defaultConfig: {
+                        name: 'Output',
+                        type: 'text',
+                        outputField: '',
+                        formatOutput: true
+                    },
+                    bodyTemplate: `
+                        <div class="node-info">
+                            <div class="node-id">output_1</div>
+                            <div class="node-type-selector">
+                                <div class="type-label">Type <i class="fas fa-circle-info"></i></div>
+                                <div class="type-value">Text</div>
+                            </div>
+                            <div class="output-field-container">
+                                <div class="output-field-label">Output <span class="required">*</span></div>
+                                <div class="output-field-input">
+                                    <input type="text" placeholder="Type {{" to utilize variables">
+                                </div>
+                            </div>
+                            <div class="format-output-container">
+                                <div class="format-output-label">Format output</div>
+                                <div class="format-output-toggle">
+                                    <div class="toggle-switch enabled"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="error-message">Output field is required</div>
+                    `,
+                    updateVisuals: (element, config) => {
+                        const typeDisplay = element.querySelector('.type-value');
+                        if (typeDisplay) {
+                            // Map type values to display values
+                            const typeMap = {
+                                'text': 'Text',
+                                'streamed_text': 'Streamed Text',
+                                'file': 'File',
+                                'image': 'Image',
+                                'audio': 'Audio',
+                                'json': 'JSON'
+                            };
+                            typeDisplay.textContent = typeMap[config.type] || 'Text';
+                        }
+                        
+                        // Update output field
+                        const outputInput = element.querySelector('.output-field-input input');
+                        if (outputInput) {
+                            outputInput.value = config.outputField || '';
+                        }
+                        
+                        // Update format toggle
+                        const formatToggle = element.querySelector('.toggle-switch');
+                        if (formatToggle) {
+                            if (config.formatOutput) {
+                                formatToggle.classList.add('enabled');
+                                formatToggle.classList.remove('disabled');
+                            } else {
+                                formatToggle.classList.add('disabled');
+                                formatToggle.classList.remove('enabled');
+                            }
+                        }
+                        
+                        // Show/hide error message
+                        const errorMessage = element.querySelector('.error-message');
+                        if (errorMessage) {
+                            if (!config.outputField) {
+                                errorMessage.style.display = 'block';
+                            } else {
+                                errorMessage.style.display = 'none';
+                            }
+                        }
+                        
+                        // Update input port types based on selected output type
+                        const node = element.closest('.workflow-node');
+                        if (node) {
+                            const nodeId = node.id;
+                            const inputPortContainer = node.querySelector('.input-ports');
+                            if (inputPortContainer) {
+                                const inputPorts = inputPortContainer.querySelectorAll('.input-port');
+                                inputPorts.forEach(port => {
+                                    port.dataset.portType = config.type;
+                                });
+                            }
+                        }
+                    }
+                },
                 textInput: {
                     title: 'Text Input',
                     description: 'Provides text input to the workflow',
@@ -792,6 +1013,301 @@ document.addEventListener('DOMContentLoaded', function() {
                         }
                         if (urlDisplay) {
                             urlDisplay.textContent = config.url || 'https://api.example.com';
+                        }
+                    }
+                },
+                openai: {
+                    title: 'OpenAI',
+                    description: 'Use OpenAI language models to generate text',
+                    inputs: [
+                        { id: 'prompt', label: 'Prompt', type: 'string' }
+                    ],
+                    outputs: [
+                        { id: 'response', label: 'Response', type: 'string' },
+                        { id: 'tokens_used', label: 'Tokens Used', type: 'number' },
+                        { id: 'input_tokens', label: 'Input Tokens', type: 'number' },
+                        { id: 'output_tokens', label: 'Output Tokens', type: 'number' },
+                        { id: 'credits_used', label: 'Credits Used', type: 'number' }
+                    ],
+                    properties: [
+                        { id: 'name', label: 'Node Name', type: 'text', default: 'OpenAI' },
+                        { id: 'provider', label: 'Provider', type: 'select', options: [
+                            { value: 'openai', label: 'OpenAI' },
+                            { value: 'azure', label: 'Azure OpenAI' },
+                            { value: 'anthropic', label: 'Anthropic' },
+                            { value: 'google', label: 'Google' }
+                        ], default: 'openai' },
+                        { id: 'model', label: 'Model', type: 'select', options: [
+                            { value: 'gpt-4', label: 'GPT-4' },
+                            { value: 'gpt-4-turbo', label: 'GPT-4 Turbo' },
+                            { value: 'gpt-3.5-turbo', label: 'GPT-3.5 Turbo' }
+                        ], default: 'gpt-3.5-turbo' },
+                        { id: 'maxTokens', label: 'Max Tokens', type: 'number', default: 1000, min: 50, max: 4000 },
+                        { id: 'temperature', label: 'Temperature', type: 'number', default: 0.7, min: 0, max: 2, step: 0.1 },
+                        { id: 'topP', label: 'Top P', type: 'number', default: 1, min: 0, max: 1, step: 0.01 },
+                        { id: 'streamResponse', label: 'Stream Response', type: 'checkbox', default: false },
+                        { id: 'jsonOutput', label: 'JSON Output', type: 'checkbox', default: false },
+                        { id: 'showSources', label: 'Show Sources', type: 'checkbox', default: false },
+                        { id: 'showConfidence', label: 'Show Confidence', type: 'checkbox', default: false },
+                        { id: 'toxicInputFiltration', label: 'Toxic Input Filtration', type: 'checkbox', default: true },
+                        { id: 'detectPII', label: 'Detect PII', type: 'checkbox', default: true }
+                    ],
+                    defaultConfig: {
+                        name: 'OpenAI',
+                        provider: 'openai',
+                        model: 'gpt-3.5-turbo',
+                        maxTokens: 1000,
+                        temperature: 0.7,
+                        topP: 1,
+                        streamResponse: false,
+                        jsonOutput: false,
+                        showSources: false,
+                        showConfidence: false,
+                        toxicInputFiltration: true,
+                        detectPII: true
+                    },
+                    bodyTemplate: `
+                        <div class="node-info">
+                            <div class="node-id">openai_0</div>
+                            <div class="model-selector">
+                                <div class="model-label">Model <i class="fas fa-circle-info"></i></div>
+                                <div class="model-value">gpt-3.5-turbo</div>
+                            </div>
+                        </div>
+                    `,
+                    updateVisuals: (element, config) => {
+                        const modelDisplay = element.querySelector('.model-value');
+                        if (modelDisplay) {
+                            modelDisplay.textContent = config.model || 'gpt-3.5-turbo';
+                        }
+                    }
+                },
+                anthropic: {
+                    title: 'Anthropic',
+                    description: 'Use Anthropic Claude language models',
+                    inputs: [
+                        { id: 'prompt', label: 'Prompt', type: 'string' }
+                    ],
+                    outputs: [
+                        { id: 'response', label: 'Response', type: 'string' },
+                        { id: 'tokens_used', label: 'Tokens Used', type: 'number' },
+                        { id: 'input_tokens', label: 'Input Tokens', type: 'number' },
+                        { id: 'output_tokens', label: 'Output Tokens', type: 'number' },
+                        { id: 'credits_used', label: 'Credits Used', type: 'number' }
+                    ],
+                    properties: [
+                        { id: 'name', label: 'Node Name', type: 'text', default: 'Anthropic' },
+                        { id: 'model', label: 'Model', type: 'select', options: [
+                            { value: 'claude-3-opus', label: 'Claude 3 Opus' },
+                            { value: 'claude-3-sonnet', label: 'Claude 3 Sonnet' },
+                            { value: 'claude-3-haiku', label: 'Claude 3 Haiku' }
+                        ], default: 'claude-3-haiku' },
+                        { id: 'maxTokens', label: 'Max Tokens', type: 'number', default: 1000, min: 50, max: 4000 },
+                        { id: 'temperature', label: 'Temperature', type: 'number', default: 0.7, min: 0, max: 1, step: 0.1 },
+                        { id: 'topP', label: 'Top P', type: 'number', default: 1, min: 0, max: 1, step: 0.01 },
+                        { id: 'streamResponse', label: 'Stream Response', type: 'checkbox', default: false },
+                        { id: 'jsonOutput', label: 'JSON Output', type: 'checkbox', default: false },
+                        { id: 'showSources', label: 'Show Sources', type: 'checkbox', default: false },
+                        { id: 'showConfidence', label: 'Show Confidence', type: 'checkbox', default: false },
+                        { id: 'toxicInputFiltration', label: 'Toxic Input Filtration', type: 'checkbox', default: true },
+                        { id: 'detectPII', label: 'Detect PII', type: 'checkbox', default: true }
+                    ],
+                    defaultConfig: {
+                        name: 'Anthropic',
+                        model: 'claude-3-haiku',
+                        maxTokens: 1000,
+                        temperature: 0.7,
+                        topP: 1,
+                        streamResponse: false,
+                        jsonOutput: false,
+                        showSources: false,
+                        showConfidence: false,
+                        toxicInputFiltration: true,
+                        detectPII: true
+                    },
+                    bodyTemplate: `
+                        <div class="node-info">
+                            <div class="node-id">anthropic_0</div>
+                            <div class="model-selector">
+                                <div class="model-label">Model <i class="fas fa-circle-info"></i></div>
+                                <div class="model-value">claude-3-haiku</div>
+                            </div>
+                        </div>
+                    `,
+                    updateVisuals: (element, config) => {
+                        const modelDisplay = element.querySelector('.model-value');
+                        if (modelDisplay) {
+                            modelDisplay.textContent = config.model || 'claude-3-haiku';
+                        }
+                    }
+                },
+                cohere: {
+                    title: 'Cohere',
+                    description: 'Use Cohere language models',
+                    inputs: [
+                        { id: 'prompt', label: 'Prompt', type: 'string' }
+                    ],
+                    outputs: [
+                        { id: 'response', label: 'Response', type: 'string' },
+                        { id: 'tokens_used', label: 'Tokens Used', type: 'number' },
+                        { id: 'input_tokens', label: 'Input Tokens', type: 'number' },
+                        { id: 'output_tokens', label: 'Output Tokens', type: 'number' },
+                        { id: 'credits_used', label: 'Credits Used', type: 'number' }
+                    ],
+                    properties: [
+                        { id: 'name', label: 'Node Name', type: 'text', default: 'Cohere' },
+                        { id: 'model', label: 'Model', type: 'select', options: [
+                            { value: 'command-r', label: 'Command R' },
+                            { value: 'command-r-plus', label: 'Command R+' }
+                        ], default: 'command-r' },
+                        { id: 'maxTokens', label: 'Max Tokens', type: 'number', default: 1000, min: 50, max: 4000 },
+                        { id: 'temperature', label: 'Temperature', type: 'number', default: 0.7, min: 0, max: 1, step: 0.1 },
+                        { id: 'topP', label: 'Top P', type: 'number', default: 1, min: 0, max: 1, step: 0.01 },
+                        { id: 'streamResponse', label: 'Stream Response', type: 'checkbox', default: false },
+                        { id: 'jsonOutput', label: 'JSON Output', type: 'checkbox', default: false },
+                        { id: 'toxicInputFiltration', label: 'Toxic Input Filtration', type: 'checkbox', default: true },
+                        { id: 'detectPII', label: 'Detect PII', type: 'checkbox', default: true }
+                    ],
+                    defaultConfig: {
+                        name: 'Cohere',
+                        model: 'command-r',
+                        maxTokens: 1000,
+                        temperature: 0.7,
+                        topP: 1,
+                        streamResponse: false,
+                        jsonOutput: false,
+                        toxicInputFiltration: true,
+                        detectPII: true
+                    },
+                    bodyTemplate: `
+                        <div class="node-info">
+                            <div class="node-id">cohere_0</div>
+                            <div class="model-selector">
+                                <div class="model-label">Model <i class="fas fa-circle-info"></i></div>
+                                <div class="model-value">command-r</div>
+                            </div>
+                        </div>
+                    `,
+                    updateVisuals: (element, config) => {
+                        const modelDisplay = element.querySelector('.model-value');
+                        if (modelDisplay) {
+                            modelDisplay.textContent = config.model || 'command-r';
+                        }
+                    }
+                },
+                google: {
+                    title: 'Google',
+                    description: 'Use Google Gemini language models',
+                    inputs: [
+                        { id: 'prompt', label: 'Prompt', type: 'string' }
+                    ],
+                    outputs: [
+                        { id: 'response', label: 'Response', type: 'string' },
+                        { id: 'tokens_used', label: 'Tokens Used', type: 'number' },
+                        { id: 'input_tokens', label: 'Input Tokens', type: 'number' },
+                        { id: 'output_tokens', label: 'Output Tokens', type: 'number' },
+                        { id: 'credits_used', label: 'Credits Used', type: 'number' }
+                    ],
+                    properties: [
+                        { id: 'name', label: 'Node Name', type: 'text', default: 'Google' },
+                        { id: 'model', label: 'Model', type: 'select', options: [
+                            { value: 'gemini-pro', label: 'Gemini Pro' },
+                            { value: 'gemini-ultra', label: 'Gemini Ultra' }
+                        ], default: 'gemini-pro' },
+                        { id: 'maxTokens', label: 'Max Tokens', type: 'number', default: 1000, min: 50, max: 4000 },
+                        { id: 'temperature', label: 'Temperature', type: 'number', default: 0.7, min: 0, max: 1, step: 0.1 },
+                        { id: 'topP', label: 'Top P', type: 'number', default: 1, min: 0, max: 1, step: 0.01 },
+                        { id: 'streamResponse', label: 'Stream Response', type: 'checkbox', default: false },
+                        { id: 'jsonOutput', label: 'JSON Output', type: 'checkbox', default: false },
+                        { id: 'showSources', label: 'Show Sources', type: 'checkbox', default: false },
+                        { id: 'toxicInputFiltration', label: 'Toxic Input Filtration', type: 'checkbox', default: true },
+                        { id: 'detectPII', label: 'Detect PII', type: 'checkbox', default: true }
+                    ],
+                    defaultConfig: {
+                        name: 'Google',
+                        model: 'gemini-pro',
+                        maxTokens: 1000,
+                        temperature: 0.7,
+                        topP: 1,
+                        streamResponse: false,
+                        jsonOutput: false,
+                        showSources: false,
+                        toxicInputFiltration: true,
+                        detectPII: true
+                    },
+                    bodyTemplate: `
+                        <div class="node-info">
+                            <div class="node-id">google_0</div>
+                            <div class="model-selector">
+                                <div class="model-label">Model <i class="fas fa-circle-info"></i></div>
+                                <div class="model-value">gemini-pro</div>
+                            </div>
+                        </div>
+                    `,
+                    updateVisuals: (element, config) => {
+                        const modelDisplay = element.querySelector('.model-value');
+                        if (modelDisplay) {
+                            modelDisplay.textContent = config.model || 'gemini-pro';
+                        }
+                    }
+                },
+                azure: {
+                    title: 'Azure OpenAI',
+                    description: 'Use Azure OpenAI language models',
+                    inputs: [
+                        { id: 'prompt', label: 'Prompt', type: 'string' }
+                    ],
+                    outputs: [
+                        { id: 'response', label: 'Response', type: 'string' },
+                        { id: 'tokens_used', label: 'Tokens Used', type: 'number' },
+                        { id: 'input_tokens', label: 'Input Tokens', type: 'number' },
+                        { id: 'output_tokens', label: 'Output Tokens', type: 'number' },
+                        { id: 'credits_used', label: 'Credits Used', type: 'number' }
+                    ],
+                    properties: [
+                        { id: 'name', label: 'Node Name', type: 'text', default: 'Azure OpenAI' },
+                        { id: 'model', label: 'Model', type: 'select', options: [
+                            { value: 'gpt-4', label: 'GPT-4' },
+                            { value: 'gpt-3.5-turbo', label: 'GPT-3.5 Turbo' }
+                        ], default: 'gpt-3.5-turbo' },
+                        { id: 'deploymentName', label: 'Deployment Name', type: 'text' },
+                        { id: 'maxTokens', label: 'Max Tokens', type: 'number', default: 1000, min: 50, max: 4000 },
+                        { id: 'temperature', label: 'Temperature', type: 'number', default: 0.7, min: 0, max: 1, step: 0.1 },
+                        { id: 'topP', label: 'Top P', type: 'number', default: 1, min: 0, max: 1, step: 0.01 },
+                        { id: 'streamResponse', label: 'Stream Response', type: 'checkbox', default: false },
+                        { id: 'jsonOutput', label: 'JSON Output', type: 'checkbox', default: false },
+                        { id: 'showSources', label: 'Show Sources', type: 'checkbox', default: false },
+                        { id: 'showConfidence', label: 'Show Confidence', type: 'checkbox', default: false },
+                        { id: 'toxicInputFiltration', label: 'Toxic Input Filtration', type: 'checkbox', default: true },
+                        { id: 'detectPII', label: 'Detect PII', type: 'checkbox', default: true }
+                    ],
+                    defaultConfig: {
+                        name: 'Azure OpenAI',
+                        model: 'gpt-3.5-turbo',
+                        deploymentName: '',
+                        maxTokens: 1000,
+                        temperature: 0.7,
+                        topP: 1,
+                        streamResponse: false,
+                        jsonOutput: false,
+                        showSources: false,
+                        showConfidence: false,
+                        toxicInputFiltration: true,
+                        detectPII: true
+                    },
+                    bodyTemplate: `
+                        <div class="node-info">
+                            <div class="node-id">azure_0</div>
+                            <div class="model-selector">
+                                <div class="model-label">Model <i class="fas fa-circle-info"></i></div>
+                                <div class="model-value">gpt-3.5-turbo</div>
+                            </div>
+                        </div>
+                    `,
+                    updateVisuals: (element, config) => {
+                        const modelDisplay = element.querySelector('.model-value');
+                        if (modelDisplay) {
+                            modelDisplay.textContent = config.model || 'gpt-3.5-turbo';
                         }
                     }
                 }
